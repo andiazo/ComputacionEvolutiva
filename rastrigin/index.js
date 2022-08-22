@@ -1,15 +1,36 @@
+import {Operator} from "./Operator.js"
+
+let statistics = []
+
 function evolutionaryAlgorithm(popsize, iters, opers) {
 	let population = generationPopulation(popsize);
-	console.log('> population:', population);
+	// console.log('> population:', population);
 	let fitness = evaluate(phenotypes(population));
-	console.log('> fitness:', fitness);
+	// console.log('> fitness:', fitness);
 	for (let i = 1; i < iters; i++) {
 		let offspring = mate(population, opers);
 		let fitnessOffspring = evaluateOffspring(phenotypes(offspring));
 		population = select(population, offspring, fitness, fitnessOffspring);
+		registerStatistics(i, population, offspring, fitness, fitnessOffspring)
 	}
 	return population;
 }
+
+function showStatistics() {
+	console.log("Statistics")
+	console.log("iteration, maxFit, minFit")
+	statistics.map((stats) => {
+		console.log(stats.iteration, stats.maxFit, stats.minFit)
+	})
+}
+
+function registerStatistics(iteration, population, offspring, fitness, fitnessOffspring) {
+	// it maxFit idxMaxFit minFit idxMinFit AvgFit MedFit StdFit
+	let maxFit = Math.max(...fitnessOffspring)
+	let minFit = Math.min(...fitnessOffspring)
+	let stats = {iteration, maxFit, minFit}
+	statistics.push(stats)
+};
 
 function mate(parents, opers) {
 	let offspring = [];
@@ -43,17 +64,18 @@ function rastrigin(x) {
 
 function generationPopulation(popsize) {
 	// Individual
-	// genotype (Arreglo binario)
+	// genotype (Arreglo de binarios) <- TODO: []
 	// phenotype (números -> x, y)
 	let population = [];
 	for (let i = 0; i < popsize; i++) {
-		let phenotype = [random(-5.12, 5.12), random(-5.12, 5.12)];
-		population.push(phenotype);
+		let genotype = [random(-5.12, 5.12), random(-5.12, 5.12)];
+		population.push(genotype);
 	}
 	return population;
 }
 
 function phenotypes(population) {
+	// TODO:
 	return population;
 }
 
@@ -109,10 +131,14 @@ function run() {
 			apply: mix,
 		},
 	];
+	console.log(Operator)
+	let parents = [[1,2,3], [3,2,1]]
+	let op = new Operator('crossover')
+	op.apply(parents);
+	// console.log(Operator(1))
 	let population = evolutionaryAlgorithm(20, 100, opers);
-	console.log('running', population);
-	console.log(population.length)
-	console.log(evaluate(phenotypes(population)))
+	// showStatistics();
+	// console.log(evaluate(phenotypes(population)))
 }
 
 run();
